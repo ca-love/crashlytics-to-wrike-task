@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "prepublish": "tsc -p tsconfig.json",
+    "publish": "npm run prepublish; ncc build lib/index.js --license license.txt",
     "lint": "eslint src",
     "lint:format": "eslint src --fix"
   },

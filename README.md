@@ -5,5 +5,4 @@ node v12
 nccを使っています。nccをインストールした上で下のコマンドを順番に実行する
 
 - npm install
-- npm run prepublish
-- ncc build lib/index.js --license license.txt
+- npm run publish
