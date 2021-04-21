@@ -165,10 +165,8 @@ async function findWrikeTasks(config: WrikeConfig, issues: Array<CrashlyticsIssu
 
 async function createWrikeTask(config: WrikeConfig, issue: CrashlyticsIssue, crashlyticsBaseUrl: string) {
   return await axiosClient.post(`/folders/${config.folderId}/tasks`, {
-    "title": issue.title,
-    "description": `${crashlyticsBaseUrl}${issue.id}
-
-    `,
+    "title": `${issue.exceptionType}(${issue.exceptionMessage}) ${issue.title}`,
+    "description": `${crashlyticsBaseUrl}${issue.id}\n`,
     "customFields": [
       {
         "id": config.crashlyticsIssueIdFieldId,
@@ -213,14 +211,12 @@ async function notifySlack(config: SlackNotifyConfig, issueBaseUrl: string, issu
   const text = issues.map((issue, index) => {
     var isFatal = ""
     if (issue.isFatal) isFatal = "Fatal Issue "
-    return `${index + 1}. ${isFatal}${issue.count} Events. <${issueBaseUrl}${issue.id}|${issue.exceptionType}(${issue.exceptionMessage}) ${issue.title}>`
+    return `${index + 1}. ${isFatal}${issue.count} Events. ${issue.exceptionType}(${issue.exceptionMessage})<${issueBaseUrl}${issue.id}|${issue.title}>`
   })
     .join('\n');
 
   return axiosClient.post(config.notifySlackUrl, {
-    text: `昨日起こったクラッシュイベント(上位)
-    ${text}
-  `
+    text: `昨日起こったクラッシュイベント(上位)\n${text}`
   });
 }
 

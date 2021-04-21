@@ -175,8 +175,8 @@ function createWrikeTask(config, issue, crashlyticsBaseUrl) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, axiosClient.post("/folders/" + config.folderId + "/tasks", {
-                        "title": issue.title,
-                        "description": "" + crashlyticsBaseUrl + issue.id + "\n\n    ",
+                        "title": issue.exceptionType + "(" + issue.exceptionMessage + ") " + issue.title,
+                        "description": "" + crashlyticsBaseUrl + issue.id + "\n",
                         "customFields": [
                             {
                                 "id": config.crashlyticsIssueIdFieldId,
@@ -254,11 +254,11 @@ function notifySlack(config, issueBaseUrl, issues) {
                 var isFatal = "";
                 if (issue.isFatal)
                     isFatal = "Fatal Issue ";
-                return index + 1 + ". " + isFatal + issue.count + " Events. <" + issueBaseUrl + issue.id + "|" + issue.exceptionType + "(" + issue.exceptionMessage + ") " + issue.title + ">";
+                return index + 1 + ". " + isFatal + issue.count + " Events. " + issue.exceptionType + "(" + issue.exceptionMessage + ")<" + issueBaseUrl + issue.id + "|" + issue.title + ">";
             })
                 .join('\n');
             return [2 /*return*/, axiosClient.post(config.notifySlackUrl, {
-                    text: "\u6628\u65E5\u8D77\u3053\u3063\u305F\u30AF\u30E9\u30C3\u30B7\u30E5\u30A4\u30D9\u30F3\u30C8(\u4E0A\u4F4D)\n    " + text + "\n  "
+                    text: "\u6628\u65E5\u8D77\u3053\u3063\u305F\u30AF\u30E9\u30C3\u30B7\u30E5\u30A4\u30D9\u30F3\u30C8(\u4E0A\u4F4D)\n" + text
                 })];
         });
     });
