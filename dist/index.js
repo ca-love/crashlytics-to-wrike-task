@@ -256,7 +256,7 @@ function notifySlack(config, issueBaseUrl, issues) {
                     isFatal = "Fatal Issue ";
                 return index + 1 + ". " + isFatal + issue.count + " Events. <" + issueBaseUrl + issue.id + "|" + issue.exceptionType + "(" + issue.exceptionMessage + ") " + issue.title + ">";
             })
-                .join('/n');
+                .join('\n');
             return [2 /*return*/, axiosClient.post(config.notifySlackUrl, {
                     text: "\u6628\u65E5\u8D77\u3053\u3063\u305F\u30AF\u30E9\u30C3\u30B7\u30E5\u30A4\u30D9\u30F3\u30C8(\u4E0A\u4F4D)\n    " + text + "\n  "
                 })];

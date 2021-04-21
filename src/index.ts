@@ -215,7 +215,7 @@ async function notifySlack(config: SlackNotifyConfig, issueBaseUrl: string, issu
     if (issue.isFatal) isFatal = "Fatal Issue "
     return `${index + 1}. ${isFatal}${issue.count} Events. <${issueBaseUrl}${issue.id}|${issue.exceptionType}(${issue.exceptionMessage}) ${issue.title}>`
   })
-    .join('/n');
+    .join('\n');
 
   return axiosClient.post(config.notifySlackUrl, {
     text: `昨日起こったクラッシュイベント(上位)
