@@ -1,0 +1,32 @@
+name: import-pull-request
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: 始点。yyyyMMdd形式。
+        required: false
+
+env:
+  TZ: "Asia/Tokyo"
+jobs:
+  import-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        if: ${{ !env.ACT }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: npm install
+      - uses: google-github-actions/setup-gcloud@master
+        if: ${{ !env.ACT }}
+        with:
+          service_account_key: ${{ secrets.GCP_BIG_QUERY_SA_KEY }}
+          export_default_credentials: true
+      - run: npm run prepublish
+      - name: import crash to wrike
+        run: node dist/index.js
+        with:
+          config_path: ./crashlytics-to-wrike-config.json
+          start_date: ${{ github.event.inputs.start_date }}

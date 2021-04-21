@@ -1,0 +1,13 @@
+name: 'Crashlytics to Wrike'
+description: 'Regist Crashlytics Issue event to Wrike'
+inputs:
+  config_path:
+    description: 'this action configuration path'
+    required: true
+  target_date:
+    description: 'import target date. yyyyMMdd'
+    required: false
+
+runs:
+  using: 'node14'
+  main: 'dist/index.js'
