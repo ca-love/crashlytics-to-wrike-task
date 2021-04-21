@@ -133,6 +133,8 @@ async function readCrashlyticsReportTable(config: CrashlyticsConfig) {
           issues
       ON
           issue_count.issue_id = issues.issue_id
+      WHERE
+          issues.is_fatal = true
       ORDER BY count DESC
       LIMIT 20
     `,
