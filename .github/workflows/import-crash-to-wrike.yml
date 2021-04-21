@@ -1,4 +1,4 @@
-name: import-pull-request
+name: import-crashlytics-to-wrike
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
 env:
   TZ: "Asia/Tokyo"
 jobs:
-  import-pull-request:
+  import-crashlytics-to-wrike:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
