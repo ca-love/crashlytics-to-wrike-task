@@ -22,6 +22,7 @@ interface WrikeConfig {
   notCompletedWorkflowStatusIds: Array<string>;
   crashlyticsIssueIdFieldId: string;
   todoWorkflowStatusId: string;
+  fixedOrIgnoreFlagFieldId: string;
 }
 
 interface CrashlyticsConfig {
@@ -152,6 +153,7 @@ async function findWrikeTasks(config: WrikeConfig, issues: Array<CrashlyticsIssu
       params: {
         "pageSize": 20,
         "nextPageToken": null,
+        "fields": '["customFields"]',
         "customField": {
           "id": config.crashlyticsIssueIdFieldId,
           "comparator": "EqualTo",
@@ -196,8 +198,15 @@ async function registerWrike(config: CrashlyticsAnalysisConfig, issues: Array<Cr
     // issueIdに紐づくtaskは基本一つ
     const task = tasks[0];
     if (task) {
+      // 修正済み/無視することにしたtaskは更新しない
+      const customFilelds = task.customFields.reduce((acc: any, v: any, _: any) => {
+        acc[v.id] = v.value
+        return acc
+      }, {});
+      const fixedOrIgnore = customFilelds[config.wrikeConfig.fixedOrIgnoreFlagFieldId] == "true"
+      const regression = config.wrikeConfig.notCompletedWorkflowStatusIds.indexOf(task.customStatusId) == -1
       // Todoで上書きするようにする
-      if (config.wrikeConfig.notCompletedWorkflowStatusIds.indexOf(task.customStatusId) == -1) {
+      if (!fixedOrIgnore && regression) {
         const res = await toTodoStatusWrikeTask(config.wrikeConfig, task);
       }
     } else {

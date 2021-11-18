@@ -154,6 +154,7 @@ function findWrikeTasks(config, issues) {
                                     params: {
                                         "pageSize": 20,
                                         "nextPageToken": null,
+                                        "fields": '["customFields"]',
                                         "customField": {
                                             "id": config.crashlyticsIssueIdFieldId,
                                             "comparator": "EqualTo",
@@ -219,13 +220,19 @@ function registerWrike(config, issues) {
                 case 1:
                     tasks = _a.sent();
                     return [2 /*return*/, Promise.all(tasks.map(function (tasks, index) { return __awaiter(_this, void 0, void 0, function () {
-                            var task, res;
+                            var task, customFilelds, fixedOrIgnore, regression, res;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
                                         task = tasks[0];
                                         if (!task) return [3 /*break*/, 3];
-                                        if (!(config.wrikeConfig.notCompletedWorkflowStatusIds.indexOf(task.customStatusId) == -1)) return [3 /*break*/, 2];
+                                        customFilelds = task.customFields.reduce(function (acc, v, _) {
+                                            acc[v.id] = v.value;
+                                            return acc;
+                                        }, {});
+                                        fixedOrIgnore = customFilelds[config.wrikeConfig.fixedOrIgnoreFlagFieldId] == "true";
+                                        regression = config.wrikeConfig.notCompletedWorkflowStatusIds.indexOf(task.customStatusId) == -1;
+                                        if (!(!fixedOrIgnore && regression)) return [3 /*break*/, 2];
                                         return [4 /*yield*/, toTodoStatusWrikeTask(config.wrikeConfig, task)];
                                     case 1:
                                         res = _a.sent();
