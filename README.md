@@ -9,13 +9,17 @@ nccを使っています。nccをインストールした上で下のコマン�
 
 ## 使い方
 GitHub Actionsで実行することを想定しています。
+
 workflow.ymlの書き方 => [workflow](.github/workflows/import-crash-to-wrike.yml)
 
 `WRIKE_TOKEN`: チケットの更新を行うWrikeのアカウント. アカウント -> アプリ&連携 -> APIで作成、Tokenの発行で作成したトークン.
+
 `config_path`: 実行するための設定値。 リグレッションと判断するために解決済みとしているworkflowのstatusIdなど。下記に詳細を示す。
 
 Workflowのid, statusIdは画面上でわからないのでAPIを実行して参照する.
+
 https://developers.wrike.com/api/v4/workflows/#query-workflows
+
 ```
 {
   "slackNotifyConfig": {
