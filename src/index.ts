@@ -250,12 +250,12 @@ async function notifySlack (config: SlackNotifyConfig, issueBaseUrl: string, iss
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: encodeURI(`${issue.eventTime} .Count: ${issue.count}. ${issue.exceptionType}(${issue.exceptionMessage})`)
+            text: `${issue.eventTime} .Count: ${issue.count}. ${issue.exceptionType}(${encodeURI(issue.exceptionMessage)})`
           },
           accessory: {
             type: 'button',
             text: {
-              type: 'plan_text',
+              type: 'plain_text',
               text: 'View'
             },
             url: `${issueBaseUrl}${issue.id}`

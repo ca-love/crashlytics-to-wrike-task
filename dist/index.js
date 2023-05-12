@@ -310,12 +310,12 @@ function notifySlack(config, issueBaseUrl, issues) {
                                 type: 'section',
                                 text: {
                                     type: 'mrkdwn',
-                                    text: encodeURI("".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")"))
+                                    text: "".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.exceptionType, "(").concat(encodeURI(issue.exceptionMessage), ")")
                                 },
                                 accessory: {
                                     type: 'button',
                                     text: {
-                                        type: 'plan_text',
+                                        type: 'plain_text',
                                         text: 'View'
                                     },
                                     url: "".concat(issueBaseUrl).concat(issue.id)
