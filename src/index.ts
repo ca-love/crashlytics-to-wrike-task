@@ -184,6 +184,7 @@ async function toTodoStatusWrikeTask (config: WrikeConfig, task: any): Promise<A
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function registerWrike (config: CrashlyticsAnalysisConfig, issues: CrashlyticsIssue[]): Promise<any[]> {
   const tasks = await findWrikeTasks(config.wrikeConfig, issues)
   return await Promise.all(tasks.map(async (tasks, index) => {
@@ -214,7 +215,7 @@ async function registerWrike (config: CrashlyticsAnalysisConfig, issues: Crashly
 }
 
 async function notifySlack (config: SlackNotifyConfig, issueBaseUrl: string, issues: CrashlyticsIssue[]): Promise<AxiosResponse> {
-  const data = {
+  const data: any = {
     blocks: [
       {
         type: 'header',
@@ -239,8 +240,16 @@ async function notifySlack (config: SlackNotifyConfig, issueBaseUrl: string, iss
       data.blocks.push({
         type: 'section',
         text: {
-          type: 'plain_text',
-          text: `${issue.eventTime} .Count: ${issue.count}. ${issue.exceptionType}(${issue.exceptionMessage})<${issueBaseUrl}${issue.id}|${issue.title}>`
+          type: 'mrkdwn',
+          text: `${issue.eventTime} .Count: ${issue.count}. ${issue.title} ${issue.exceptionType}(${issue.exceptionMessage})`
+        },
+        accessory: {
+          type: 'button',
+          text: {
+            type: 'plan_text',
+            text: 'View'
+          },
+          url: `${issueBaseUrl}${issue.id}`
         }
       })
     })
@@ -252,7 +261,7 @@ async function notifySlack (config: SlackNotifyConfig, issueBaseUrl: string, iss
 async function cli (): Promise<void> {
   const config = readConfig(core.getInput('config_path'))
   const issues = await readCrashlyticsReportTable(config.crashlyticsConfig)
-  await registerWrike(config, issues)
+  // await registerWrike(config, issues)
   await notifySlack(config.slackNotifyConfig, config.crashlyticsConfig.issueBaseUrl, issues)
   await Promise.resolve()
 }

@@ -216,6 +216,7 @@ function toTodoStatusWrikeTask(config, task) {
         });
     });
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function registerWrike(config, issues) {
     return __awaiter(this, void 0, void 0, function () {
         var tasks;
@@ -297,8 +298,16 @@ function notifySlack(config, issueBaseUrl, issues) {
                             data.blocks.push({
                                 type: 'section',
                                 text: {
-                                    type: 'plain_text',
-                                    text: "".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")<").concat(issueBaseUrl).concat(issue.id, "|").concat(issue.title, ">")
+                                    type: 'mrkdwn',
+                                    text: "".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.title, " ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")")
+                                },
+                                accessory: {
+                                    type: 'button',
+                                    text: {
+                                        type: 'plan_text',
+                                        text: 'View'
+                                    },
+                                    url: "".concat(issueBaseUrl).concat(issue.id)
                                 }
                             });
                         });
@@ -316,17 +325,18 @@ function cli() {
             switch (_a.label) {
                 case 0:
                     config = readConfig(core.getInput('config_path'));
-                    return [4 /*yield*/, readCrashlyticsReportTable(config.crashlyticsConfig)];
+                    return [4 /*yield*/, readCrashlyticsReportTable(config.crashlyticsConfig)
+                        // await registerWrike(config, issues)
+                    ];
                 case 1:
                     issues = _a.sent();
-                    return [4 /*yield*/, registerWrike(config, issues)];
-                case 2:
-                    _a.sent();
+                    // await registerWrike(config, issues)
                     return [4 /*yield*/, notifySlack(config.slackNotifyConfig, config.crashlyticsConfig.issueBaseUrl, issues)];
-                case 3:
+                case 2:
+                    // await registerWrike(config, issues)
                     _a.sent();
                     return [4 /*yield*/, Promise.resolve()];
-                case 4:
+                case 3:
                     _a.sent();
                     return [2 /*return*/];
             }
