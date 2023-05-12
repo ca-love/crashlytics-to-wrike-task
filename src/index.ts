@@ -115,6 +115,8 @@ async function readCrashlyticsReportTable (config: CrashlyticsConfig): Promise<C
               UNNEST(exceptions) as exceptions
           WHERE
               FORMAT_DATE("%Y%m%d", event_timestamp) = ${placeHolder}
+          AND
+              error_type = 'FATAL'
       )
       
       SELECT
