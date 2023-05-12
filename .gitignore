@@ -1,5 +1,6 @@
 crashlytics-to-wrike-config.json
 lib
+.idea
 
 # Created by https://www.gitignore.io/api/node
 

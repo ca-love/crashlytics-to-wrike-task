@@ -1,11 +1,14 @@
 ## 環境
-node v12
+node v16
 
 ## リリース手順
 nccを使っています。nccをインストールした上で下のコマンドを順番に実行する
 
 - npm install
 - npm run publish
+
+出力されたlib/index.jsを含めてcommit.
+リリースするcommitでタグをきる。使う側はそのタグを指定して利用する。
 
 ## 使い方
 GitHub Actionsで実行することを想定しています。
