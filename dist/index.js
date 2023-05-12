@@ -269,7 +269,7 @@ function registerWrike(config, issues) {
 }
 function notifySlack(config, issueBaseUrl, issues) {
     return __awaiter(this, void 0, void 0, function () {
-        var data;
+        var data, ids_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -294,12 +294,23 @@ function notifySlack(config, issueBaseUrl, issues) {
                         });
                     }
                     else {
-                        issues.forEach(function (issue, index) {
+                        ids_1 = {};
+                        issues
+                            .filter(function (issue, index) {
+                            if (ids_1[issue.id] === undefined) {
+                                ids_1[issue.id] = true;
+                                return true;
+                            }
+                            else {
+                                return false;
+                            }
+                        })
+                            .forEach(function (issue, index) {
                             data.blocks.push({
                                 type: 'section',
                                 text: {
                                     type: 'mrkdwn',
-                                    text: "".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.title, " ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")")
+                                    text: "".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")")
                                 },
                                 accessory: {
                                     type: 'button',

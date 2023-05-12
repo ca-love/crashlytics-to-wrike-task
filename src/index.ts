@@ -44,7 +44,6 @@ interface CrashlyticsAnalysisConfig {
 interface CrashlyticsIssue {
   eventTime: string
   count: number
-  isFatal: boolean
   id: string
   title: string
   exceptionType: string
@@ -236,23 +235,33 @@ async function notifySlack (config: SlackNotifyConfig, issueBaseUrl: string, iss
       }
     })
   } else {
-    issues.forEach((issue, index) => {
-      data.blocks.push({
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `${issue.eventTime} .Count: ${issue.count}. ${issue.title} ${issue.exceptionType}(${issue.exceptionMessage})`
-        },
-        accessory: {
-          type: 'button',
-          text: {
-            type: 'plan_text',
-            text: 'View'
-          },
-          url: `${issueBaseUrl}${issue.id}`
+    const ids: any = {}
+    issues
+      .filter((issue: CrashlyticsIssue, index: number) => {
+        if (ids[issue.id] === undefined) {
+          ids[issue.id] = true
+          return true
+        } else {
+          return false
         }
       })
-    })
+      .forEach((issue, index) => {
+        data.blocks.push({
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `${issue.eventTime} .Count: ${issue.count}. ${issue.exceptionType}(${issue.exceptionMessage})`
+          },
+          accessory: {
+            type: 'button',
+            text: {
+              type: 'plan_text',
+              text: 'View'
+            },
+            url: `${issueBaseUrl}${issue.id}`
+          }
+        })
+      })
   }
 
   return await axiosClient.post(config.notifySlackUrl, data)
