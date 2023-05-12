@@ -191,10 +191,15 @@ async function registerWrike (config: CrashlyticsAnalysisConfig, issues: Crashly
     const task = tasks[0]
     if (task !== undefined) {
       // 修正済み/無視することにしたtaskは更新しない
-      const customFields = task.customFields.reduce((acc: any, v: any, _: any) => {
-        acc[v.id] = v.value
-        return acc
-      }, {})
+      let customFields
+      if (task.customFields !== undefined) {
+        customFields = task.customFields.reduce((acc: any, v: any, _: any) => {
+          acc[v.id] = v.value
+          return acc
+        }, {})
+      } else {
+        customFields = {}
+      }
       const fixedOrIgnore = customFields[config.wrikeConfig.fixedOrIgnoreFlagFieldId] === 'true'
       const regression = !config.wrikeConfig.notCompletedWorkflowStatusIds.includes(task.customStatusId)
       // Todoで上書きするようにする
