@@ -160,11 +160,7 @@ function findWrikeTasks(config, issues) {
                                             pageSize: 20,
                                             nextPageToken: null,
                                             fields: '["customFields"]',
-                                            customField: {
-                                                id: config.crashlyticsIssueIdFieldId,
-                                                comparator: 'EqualTo',
-                                                value: "".concat(issue.id)
-                                            }
+                                            customField: "{ \"id\": \"".concat(config.crashlyticsIssueIdFieldId, "\", \"comparator\":\"EqualTo\", \"value\":\"").concat(issue.id, "\" }")
                                         }
                                     })];
                                 case 1:

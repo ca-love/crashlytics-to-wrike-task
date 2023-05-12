@@ -145,11 +145,7 @@ async function findWrikeTasks (config: WrikeConfig, issues: CrashlyticsIssue[]):
         pageSize: 20,
         nextPageToken: null,
         fields: '["customFields"]',
-        customField: {
-          id: config.crashlyticsIssueIdFieldId,
-          comparator: 'EqualTo',
-          value: `${issue.id}`
-        }
+        customField: `{ "id": "${config.crashlyticsIssueIdFieldId}", "comparator":"EqualTo", "value":"${issue.id}" }`
       }
     })
     return res.data.data
