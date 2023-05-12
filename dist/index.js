@@ -126,7 +126,7 @@ function readCrashlyticsReportTable(config) {
                         projectId: config.gcpProjectId
                     });
                     targetDate = core.getInput('target_date');
-                    if (targetDate === undefined) {
+                    if (targetDate !== undefined) {
                         placeHolder = '@targetDate';
                     }
                     else {
@@ -226,17 +226,23 @@ function registerWrike(config, issues) {
                 case 1:
                     tasks = _a.sent();
                     return [4 /*yield*/, Promise.all(tasks.map(function (tasks, index) { return __awaiter(_this, void 0, void 0, function () {
-                            var task, customFilelds, fixedOrIgnore, regression;
+                            var task, customFields, fixedOrIgnore, regression;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
                                         task = tasks[0];
-                                        if (!(task === undefined)) return [3 /*break*/, 3];
-                                        customFilelds = task.customFields.reduce(function (acc, v, _) {
-                                            acc[v.id] = v.value;
-                                            return acc;
-                                        }, {});
-                                        fixedOrIgnore = customFilelds[config.wrikeConfig.fixedOrIgnoreFlagFieldId] === 'true';
+                                        if (!(task !== undefined)) return [3 /*break*/, 3];
+                                        customFields = void 0;
+                                        if (task.customFields !== undefined) {
+                                            customFields = task.customFields.reduce(function (acc, v, _) {
+                                                acc[v.id] = v.value;
+                                                return acc;
+                                            }, {});
+                                        }
+                                        else {
+                                            customFields = {};
+                                        }
+                                        fixedOrIgnore = customFields[config.wrikeConfig.fixedOrIgnoreFlagFieldId] === 'true';
                                         regression = !config.wrikeConfig.notCompletedWorkflowStatusIds.includes(task.customStatusId);
                                         if (!(!fixedOrIgnore && regression)) return [3 /*break*/, 2];
                                         return [4 /*yield*/, toTodoStatusWrikeTask(config.wrikeConfig, task)];
