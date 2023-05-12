@@ -86,7 +86,7 @@ async function readCrashlyticsReportTable (config: CrashlyticsConfig): Promise<C
 
   const targetDate = core.getInput('target_date')
   let placeHolder: string
-  if (targetDate === undefined) {
+  if (targetDate !== undefined) {
     placeHolder = '@targetDate'
   } else {
     // 実行時の関係で昨日のimportされてないケースがある
@@ -189,13 +189,13 @@ async function registerWrike (config: CrashlyticsAnalysisConfig, issues: Crashly
   return await Promise.all(tasks.map(async (tasks, index) => {
     // issueIdに紐づくtaskは基本一つ
     const task = tasks[0]
-    if (task === undefined) {
+    if (task !== undefined) {
       // 修正済み/無視することにしたtaskは更新しない
-      const customFilelds = task.customFields.reduce((acc: any, v: any, _: any) => {
+      const customFields = task.customFields.reduce((acc: any, v: any, _: any) => {
         acc[v.id] = v.value
         return acc
       }, {})
-      const fixedOrIgnore = customFilelds[config.wrikeConfig.fixedOrIgnoreFlagFieldId] === 'true'
+      const fixedOrIgnore = customFields[config.wrikeConfig.fixedOrIgnoreFlagFieldId] === 'true'
       const regression = !config.wrikeConfig.notCompletedWorkflowStatusIds.includes(task.customStatusId)
       // Todoで上書きするようにする
       if (!fixedOrIgnore && regression) {
