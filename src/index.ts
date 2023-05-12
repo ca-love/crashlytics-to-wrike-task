@@ -42,6 +42,7 @@ interface CrashlyticsAnalysisConfig {
 }
 
 interface CrashlyticsIssue {
+  eventTime: string
   count: number
   isFatal: boolean
   id: string
@@ -88,7 +89,8 @@ async function readCrashlyticsReportTable (config: CrashlyticsConfig): Promise<C
   if (targetDate === undefined) {
     placeHolder = '@targetDate'
   } else {
-    placeHolder = 'FORMAT_DATE("%Y%m%d", CURRENT_DATE(\'Asia/Tokyo\') - 1)'
+    // 実行時の関係で昨日のimportされてないケースがある
+    placeHolder = 'FORMAT_DATE("%Y%m%d", CURRENT_DATE(\'Asia/Tokyo\') - 2)'
   }
 
   const [results] = await bigquery.query({
@@ -107,7 +109,8 @@ async function readCrashlyticsReportTable (config: CrashlyticsConfig): Promise<C
               DISTINCT issue_id,
               issue_title,
               exceptions.type as exception_type,
-              exceptions.exception_message as exception_message
+              exceptions.exception_message as exception_message,
+              FORMAT_DATE("%Y-%m-%d", event_timestamp) as event_time
           FROM 
               \`firebase_crashlytics.${config.tableName}\`,
               UNNEST(exceptions) as exceptions
@@ -116,6 +119,7 @@ async function readCrashlyticsReportTable (config: CrashlyticsConfig): Promise<C
       )
       
       SELECT
+          issues.event_time as eventTime,
           issue_count.count as count,
           issues.issue_id as id,
           issues.issue_title as title,
@@ -211,20 +215,31 @@ async function notifySlack (config: SlackNotifyConfig, issueBaseUrl: string, iss
         type: 'header',
         text: {
           type: 'plain_text',
-          text: '昨日起こったイベント'
+          text: '起こったイベント'
         }
       }
     ]
   }
-  issues.forEach((issue, index) => {
+
+  if (issues.length === 0) {
     data.blocks.push({
       type: 'section',
       text: {
         type: 'plain_text',
-        text: `Count: ${issue.count}. ${issue.exceptionType}(${issue.exceptionMessage})<${issueBaseUrl}${issue.id}|${issue.title}>`
+        text: 'なし'
       }
     })
-  })
+  } else {
+    issues.forEach((issue, index) => {
+      data.blocks.push({
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text: `${issue.eventTime} .Count: ${issue.count}. ${issue.exceptionType}(${issue.exceptionMessage})<${issueBaseUrl}${issue.id}|${issue.title}>`
+        }
+      })
+    })
+  }
 
   return await axiosClient.post(config.notifySlackUrl, data)
 }

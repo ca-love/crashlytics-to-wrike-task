@@ -130,10 +130,11 @@ function readCrashlyticsReportTable(config) {
                         placeHolder = '@targetDate';
                     }
                     else {
-                        placeHolder = 'FORMAT_DATE("%Y%m%d", CURRENT_DATE(\'Asia/Tokyo\') - 1)';
+                        // 実行時の関係で昨日のimportされてないケースがある
+                        placeHolder = 'FORMAT_DATE("%Y%m%d", CURRENT_DATE(\'Asia/Tokyo\') - 2)';
                     }
                     return [4 /*yield*/, bigquery.query({
-                            query: "\n      WITH issue_count AS (\n          SELECT\n              count(*) as count, issue_id\n          FROM\n              `firebase_crashlytics.".concat(config.tableName, "`\n          WHERE\n              FORMAT_DATE(\"%Y%m%d\", event_timestamp) = ").concat(placeHolder, "\n          group by issue_id\n      ),\n      issues AS (\n          SELECT\n              DISTINCT issue_id,\n              issue_title,\n              exceptions.type as exception_type,\n              exceptions.exception_message as exception_message\n          FROM \n              `firebase_crashlytics.").concat(config.tableName, "`,\n              UNNEST(exceptions) as exceptions\n          WHERE\n              FORMAT_DATE(\"%Y%m%d\", event_timestamp) = ").concat(placeHolder, "\n      )\n      \n      SELECT\n          issue_count.count as count,\n          issues.issue_id as id,\n          issues.issue_title as title,\n          issues.exception_type as exceptionType,\n          issues.exception_message as exceptionMessage\n      FROM\n          issue_count \n      INNER JOIN\n          issues\n      ON\n          issue_count.issue_id = issues.issue_id\n      ORDER BY count DESC\n      LIMIT 100\n    "),
+                            query: "\n      WITH issue_count AS (\n          SELECT\n              count(*) as count, issue_id\n          FROM\n              `firebase_crashlytics.".concat(config.tableName, "`\n          WHERE\n              FORMAT_DATE(\"%Y%m%d\", event_timestamp) = ").concat(placeHolder, "\n          group by issue_id\n      ),\n      issues AS (\n          SELECT\n              DISTINCT issue_id,\n              issue_title,\n              exceptions.type as exception_type,\n              exceptions.exception_message as exception_message,\n              FORMAT_DATE(\"%Y-%m-%d\", event_timestamp) as event_time\n          FROM \n              `firebase_crashlytics.").concat(config.tableName, "`,\n              UNNEST(exceptions) as exceptions\n          WHERE\n              FORMAT_DATE(\"%Y%m%d\", event_timestamp) = ").concat(placeHolder, "\n      )\n      \n      SELECT\n          issues.event_time as eventTime,\n          issue_count.count as count,\n          issues.issue_id as id,\n          issues.issue_title as title,\n          issues.exception_type as exceptionType,\n          issues.exception_message as exceptionMessage\n      FROM\n          issue_count \n      INNER JOIN\n          issues\n      ON\n          issue_count.issue_id = issues.issue_id\n      ORDER BY count DESC\n      LIMIT 100\n    "),
                             params: { targetDate: targetDate }
                         })];
                 case 1:
@@ -271,20 +272,31 @@ function notifySlack(config, issueBaseUrl, issues) {
                                 type: 'header',
                                 text: {
                                     type: 'plain_text',
-                                    text: '昨日起こったイベント'
+                                    text: '起こったイベント'
                                 }
                             }
                         ]
                     };
-                    issues.forEach(function (issue, index) {
+                    if (issues.length === 0) {
                         data.blocks.push({
                             type: 'section',
                             text: {
                                 type: 'plain_text',
-                                text: "Count: ".concat(issue.count, ". ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")<").concat(issueBaseUrl).concat(issue.id, "|").concat(issue.title, ">")
+                                text: 'なし'
                             }
                         });
-                    });
+                    }
+                    else {
+                        issues.forEach(function (issue, index) {
+                            data.blocks.push({
+                                type: 'section',
+                                text: {
+                                    type: 'plain_text',
+                                    text: "".concat(issue.eventTime, " .Count: ").concat(issue.count, ". ").concat(issue.exceptionType, "(").concat(issue.exceptionMessage, ")<").concat(issueBaseUrl).concat(issue.id, "|").concat(issue.title, ">")
+                                }
+                            });
+                        });
+                    }
                     return [4 /*yield*/, axiosClient.post(config.notifySlackUrl, data)];
                 case 1: return [2 /*return*/, _a.sent()];
             }
