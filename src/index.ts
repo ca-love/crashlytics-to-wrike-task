@@ -85,7 +85,7 @@ async function readCrashlyticsReportTable (config: CrashlyticsConfig): Promise<C
 
   const targetDate = core.getInput('target_date')
   let placeHolder: string
-  if (targetDate !== undefined) {
+  if (targetDate !== '') {
     placeHolder = '@targetDate'
   } else {
     // 実行時の関係で昨日のimportされてないケースがある
