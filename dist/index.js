@@ -126,7 +126,7 @@ function readCrashlyticsReportTable(config) {
                         projectId: config.gcpProjectId
                     });
                     targetDate = core.getInput('target_date');
-                    if (targetDate !== undefined) {
+                    if (targetDate !== '') {
                         placeHolder = '@targetDate';
                     }
                     else {
